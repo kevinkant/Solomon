@@ -6,8 +6,8 @@ class Player : Combatant
 
     public override void TakeDamage(int value)
     {
-        Hp -= value;
-        Hp = Math.Clamp(Hp, 0, 200);
+        CurrHp -= value;
+        CurrHp = Math.Clamp(CurrHp, 0, 200);
     }
 
     public override void Defend()
@@ -18,7 +18,8 @@ class Player : Combatant
     public Player()
     {
         Name = "Kevin";
-        Hp = 200;
+        MaxHp = 200;
+        CurrHp = MaxHp;
         Atk = 10;
         Def = 60;
         Spd = 50;

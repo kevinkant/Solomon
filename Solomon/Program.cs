@@ -4,3 +4,9 @@ BattleEngine battle = new(player, enemy);
 
 
 
+while (player.CurrHp != 0)
+{
+    battle.StartBattle();
+    
+    
+}
