@@ -1,2 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿Player player = new();
+Enemy enemy = new();
+BattleEngine battle = new(player, enemy);
+
+
+
