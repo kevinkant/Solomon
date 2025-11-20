@@ -1,12 +1,10 @@
 ﻿Player player = new();
 Enemy enemy = new();
-BattleEngine battle = new(player, enemy);
+BattleSetup battleSetup = new(player, enemy);
+BattleEngine battle = new(battleSetup);
 
 
 
-while (player.CurrHp != 0)
-{
-    battle.StartBattle();
-    
-    
-}
+
+battle.StartBattle();
+battle.StartTurn();

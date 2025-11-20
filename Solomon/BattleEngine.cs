@@ -1,22 +1,33 @@
-using System.Collections;
 
-class BattleEngine(Player player, Enemy enemy)
+
+class BattleEngine(BattleSetup battleSetup)
 {
     //readonly behaviour to ensure enemy and player is never suddenly changed
-    private readonly Player _player = player;
-    private readonly Enemy _enemy = enemy;
-
+    private readonly BattleSetup battleContext = battleSetup;
     public void StartBattle()
     {
-      Console.WriteLine($"Battle start between {_player.Name} and {_enemy.Name}");
+      Console.WriteLine($"Battle start between {battleContext.Player.Name} and {battleContext.Enemy.Name}");
 
     }
 
     
     public void StartTurn()
     {
-        Action turnPhase = turnOrder.Dequeue();
-        turnPhase.Invoke();
+
+        battleContext.DetermineTurnOrder();
+
+        Combatant combatant = battleContext.TurnOrder.Dequeue();
+
+        switch (combatant)
+        {
+            case Player:
+                PlayerTurn();
+                break;
+            case Enemy:
+                EnemyTurn();
+                break;
+
+        }
     }
 
     private enum PlayerAction
@@ -35,13 +46,14 @@ class BattleEngine(Player player, Enemy enemy)
 
         int value = Convert.ToInt32(Console.ReadLine());
 
-        switch (playeraction)
+        switch (value)
         {
-            case PlayerAction.Attack:
+            case (int)PlayerAction.Attack:
                 PlayerAttack();
                 break; 
-            case PlayerAction.Defend:
-                _player.Defend();
+            case (int)PlayerAction.Defend:
+                battleContext.Player.Defend();
+                battleContext.TurnOrder.Enqueue(battleContext.Player);
                 break;
         }
     }
@@ -49,23 +61,23 @@ class BattleEngine(Player player, Enemy enemy)
 
     public void PlayerAttack()
     {
-
-        int atk_value = _player.Atk;
-        _enemy.TakeDamage(atk_value);
-        Console.WriteLine($"{_enemy.Name} took {atk_value} damage. They have {_enemy.CurrHp} remaining");
+        int atk_value = battleContext.Player.Atk;
+        battleContext.Enemy.TakeDamage(atk_value);
+        Console.WriteLine($"{battleContext.Enemy.Name} took {atk_value} damage. They have {battleContext.Enemy.CurrHp} remaining");
+        battleContext.TurnOrder.Enqueue(battleContext.Player);
         EndTurn();
     }
 
     public void EnemyTurn()
     {
-        int Hp_percentage = _enemy.CurrHp / _enemy.MaxHp * 100;
+        int Hp_percentage = battleContext.Enemy.CurrHp / battleContext.Enemy.MaxHp * 100;
 
         if (Hp_percentage >= 70)
         {
             EnemyAttack();
         } else if (Hp_percentage >= 30)
         {
-            _player.Defend();
+            battleContext.Player.Defend();
         }
         else
         {
@@ -76,29 +88,33 @@ class BattleEngine(Player player, Enemy enemy)
 
     public void EnemyAttack()
     {
-        int atk_value = _enemy.Atk;
-        _player.TakeDamage(atk_value);
-        Console.WriteLine($"{_player.Name} took {atk_value} damage. They have {_player.CurrHp} remaining");
+        int atk_value = battleContext.Enemy.Atk;
+        battleContext.Player.TakeDamage(atk_value);
+        Console.WriteLine($"{battleContext.Player.Name} took {atk_value} damage. They have {battleContext.Player.CurrHp} remaining");
+        battleContext.TurnOrder.Enqueue(battleContext.Enemy);
+        EndTurn();
     }
 
     public void EndTurn()
     {
         CheckDeath();
-        //turnOrder.Dequeue();
-        EndGame();
-
+        StartTurn();
     }
     
     
     public void CheckDeath()
     {
-        if (_player.CurrHp <=0)
+        if (battleContext.Player.CurrHp <=0)
         {
-            Console.WriteLine($"{_player.Name} is dead! {_enemy.Name} wins this battle!");
+            Console.WriteLine($"{battleContext.Player.Name} is dead! {battleContext.Enemy.Name} wins this battle!");
         }
-        else if (_enemy.CurrHp <= 0)
+        else if (battleContext.Enemy.CurrHp <= 0)
         {
-            Console.WriteLine($"{_player.Name} is dead! {_enemy.Name} wins this battle!");
+            Console.WriteLine($"{battleContext.Enemy.Name} is dead! {battleContext.Player.Name} wins this battle!");
+        }
+        else
+        {
+            Console.WriteLine("The battle continues...");
         }
     }
 

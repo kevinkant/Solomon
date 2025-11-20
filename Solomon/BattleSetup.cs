@@ -1,28 +1,19 @@
 class BattleSetup(Player player, Enemy enemy)
 {
-
-    private readonly Player _player = player;
-    private readonly Enemy _enemy = enemy;
-
-    readonly Queue<Action> turnOrder = [];   
-
-    enum Turn
-    {
-        Player,
-        Enemy
-    }
+    public Player Player { get; } = player;
+    public Enemy Enemy { get; } = enemy;
+    public Queue<Combatant> TurnOrder { get; } = new();
     public void DetermineTurnOrder()
     {
-        if (_player.Spd > _enemy.Spd)
+        if (Player.Spd > Enemy.Spd)
         {
-            turnOrder.Enqueue( () => PlayerTurn());
-            turnOrder.Enqueue( () => EnemyTurn());
+            TurnOrder.Enqueue(Player);
+            TurnOrder.Enqueue(Enemy);
         }
         else
         {
-            turnOrder.Enqueue( () => EnemyTurn());
-            turnOrder.Enqueue( () => PlayerTurn());
+            TurnOrder.Enqueue(Enemy);
+            TurnOrder.Enqueue(Player);
         }
     }
-
 }
