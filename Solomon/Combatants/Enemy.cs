@@ -21,7 +21,7 @@ class Enemy : Combatant
 
     public override void Defend()
     {
-        Def = (int)(Def + (Def*0.15));
+        
     }
 
      public Enemy()
