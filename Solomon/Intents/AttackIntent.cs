@@ -1,3 +1,5 @@
+
+
 /// <summary>
 /// Attacks a Target
 /// </summary>
@@ -9,6 +11,22 @@ record AttackIntent(Combatant Attacker, Combatant Target) : IActionIntent
     {
         int dmg = Attacker.Atk;
         Target.TakeDamage(dmg);
-        Console.WriteLine($"You attacked {Target.Name}");
+
+        if (Attacker.GetType() == typeof(Player))
+        {
+            Console.WriteLine($"You attacked {Target.Name}");
+        }
+        else
+        {
+            Console.WriteLine($"You got attacked by {Attacker.Name}");
+        }
+    }
+}
+
+record BuffIntent(Combatant Attacker) : IActionIntent
+{
+    public void Execute()
+    {
+        throw new NotImplementedException();
     }
 }

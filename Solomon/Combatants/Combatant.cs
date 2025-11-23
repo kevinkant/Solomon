@@ -13,7 +13,19 @@ abstract class Combatant
 
 
     public abstract void TakeDamage(int value);
-    public abstract void Defend();
+
+    public bool IsDead()
+    {
+        if (CurrHp <= 0)
+        {
+            return true;
+        }
+        else
+        { 
+            return false;
+        }
+    }
+
 
     
 }

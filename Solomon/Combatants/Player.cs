@@ -10,14 +10,11 @@ class Player : Combatant
         CurrHp = Math.Clamp(CurrHp, 0, 200);
     }
 
-    public override void Defend()
-    {
-        Def = (int)(Def + (Def*0.15));
-    }
+
 
     public Player()
     {
-        Name = "Kevin";
+        Name = "Player1";
         MaxHp = 200;
         CurrHp = MaxHp;
         Atk = 10;

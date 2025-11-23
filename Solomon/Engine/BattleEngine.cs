@@ -3,20 +3,22 @@ class BattleEngine(BattleSetup battleSetup)
 {
     //readonly behaviour to ensure enemy and player is never suddenly changed
     private readonly BattleSetup battleContext = battleSetup;
-
+    readonly Print print = new(battleSetup);
     
-
-    
-
-    public void StartBattle()
+    public void TurnResolution()
     {
-      Console.WriteLine($"Battle start between {battleContext.Player.Name} and {battleContext.Enemy.Name}");
+        var action = PlayerChoice();
+        Console.WriteLine(action);
 
-      var turnOrder = DetermineTurnOrder(battleContext.Combatants);
 
-      foreach (Combatant combatant in turnOrder)
+        GetPlayerAction(battleContext.Player, battleContext.Enemy, action);
+        
+        var turnOrder = DetermineTurnOrder(battleContext.Combatants);
+
+        foreach (Combatant combatant in turnOrder)
         {
-            PlayerAction action = PlayerChoice();
+            var intent = combatant.ActionQueue.Dequeue();
+            intent.Execute();
         }
 
 
@@ -48,15 +50,8 @@ class BattleEngine(BattleSetup battleSetup)
         // }
     }
 
-    public void ContinueTurn()
-    {
-        throw new NotImplementedException();
-    }
-
     public void EndTurn()
     {
-        CheckDeath();
-        ContinueTurn();
         EndGame();
     }
 
@@ -68,17 +63,14 @@ class BattleEngine(BattleSetup battleSetup)
 
     public enum EnemyAction
     {
-        
+        Attack = 1,
+        Defend = 2
     }
 
     public PlayerAction PlayerChoice()
     {
 
-        Console.WriteLine("Please select an action!");
-        Console.WriteLine("-------------------------");
-        Console.WriteLine("1. Attack");
-        Console.WriteLine("2. Defend");
-        Console.WriteLine("-------------------------");
+        print.StartBattleMessage();
 
         int value = Convert.ToInt32(Console.ReadLine());
 
@@ -92,7 +84,7 @@ class BattleEngine(BattleSetup battleSetup)
 
     
     
-    public void ExecutePlayerTurn(Combatant combatant, Combatant target, PlayerAction action)
+    public void GetPlayerAction(Combatant combatant, Combatant target, PlayerAction action)
     {
         
         switch (action)
@@ -107,82 +99,18 @@ class BattleEngine(BattleSetup battleSetup)
     }
 
 
-    public void PlayerAttack()
-    {
-        int atk_value = battleContext.Player.Atk;
-        battleContext.Enemy.TakeDamage(atk_value);
-        Console.WriteLine($"You attacked {battleContext.Enemy.Name}");
 
-    }
 
-    public void EnemyAttack()
-    {
-        int atk_value = battleContext.Enemy.Atk;
-        battleContext.Player.TakeDamage(atk_value);
-        Console.WriteLine($"{battleContext.Player.Name} took {atk_value} damage. They have {battleContext.Player.CurrHp} remaining");
-    }
-
-    public void Attack(Combatant attacker, Combatant defender)
-    {
-        int atk_value = battleContext.Enemy.Atk;
-        battleContext.Player.TakeDamage(atk_value);
-        Console.WriteLine($"{battleContext.Player.Name} took {atk_value} damage. They have {battleContext.Player.CurrHp} remaining");
-    }
-
+    
     public void EnemyChoice()
     {
         int Hp_percentage = battleContext.Enemy.CurrHp / battleContext.Enemy.MaxHp * 100;
-
-        if (Hp_percentage >= 70)
-        {
-            EnemyAttack();
-        } else if (Hp_percentage >= 30)
-        {
-            battleContext.Player.Defend();
-        }
-        else
-        {
-            EnemyAttack();
-        }
     }
 
-
-    
-
-    
-    
-    
-    public void CheckDeath()
-    {
-        if (battleContext.Player.CurrHp <=0)
-        {
-            Console.WriteLine($"{battleContext.Player.Name} is dead! {battleContext.Enemy.Name} wins this battle!");
-        }
-        else if (battleContext.Enemy.CurrHp <= 0)
-        {
-            Console.WriteLine($"{battleContext.Enemy.Name} is dead! {battleContext.Player.Name} wins this battle!");
-        }
-        else
-        {
-            Console.WriteLine("The battle continues...");
-        }
-    }
 
     public void EndGame()
     {
 
-    }
-
-    public void ExecuteCombatantTurn(Combatant combatant)
-    {
-        if (combatant.GetType() == typeof(Player))
-        {
-            // Execute player turn
-        }
-        else
-        {
-            // Execute enemy attack
-        }
     }
     
 }

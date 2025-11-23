@@ -19,10 +19,6 @@ class Enemy : Combatant
         CurrHp = Math.Clamp(CurrHp, 0, 200);
     }
 
-    public override void Defend()
-    {
-        
-    }
 
      public Enemy()
     {
