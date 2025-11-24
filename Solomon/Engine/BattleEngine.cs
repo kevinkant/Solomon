@@ -4,14 +4,29 @@ class BattleEngine(BattleSetup battleSetup)
     //readonly behaviour to ensure enemy and player is never suddenly changed
     private readonly BattleSetup battleContext = battleSetup;
     readonly Print print = new(battleSetup);
+
+    public void BattleLoop()
+    {
+        print.StartBattleMessage();
+
+        while(!battleContext.Player.IsDead() && !battleContext.Enemy.IsDead())
+        {
+            TurnResolution();
+            print.EndOfTurn();
+        }
+
+        print.EndOfBattleMessage();
+        EndGame();
+    }
+    
     
     public void TurnResolution()
     {
         var action = PlayerChoice();
-        Console.WriteLine(action);
-
-
+        var eAction = EnemyChoice();
+        
         GetPlayerAction(battleContext.Player, battleContext.Enemy, action);
+        GetEnemyAction(battleContext.Enemy, battleContext.Player, eAction);
         
         var turnOrder = DetermineTurnOrder(battleContext.Combatants);
 
@@ -20,7 +35,6 @@ class BattleEngine(BattleSetup battleSetup)
             var intent = combatant.ActionQueue.Dequeue();
             intent.Execute();
         }
-
 
     }
 
@@ -31,29 +45,6 @@ class BattleEngine(BattleSetup battleSetup)
        .ToList();
     }
 
-
-    
-    public void StartTurn()
-    {
-        // battleContext.DetermineTurnOrder();
-        // Combatant combatant = battleContext.TurnOrder.Dequeue();
-
-        // switch (combatant)
-        // {
-        //     case Player:
-        //         PlayerAction action = PlayerTurn();
-        //         ExecutePlayerTurn(action);
-        //         break;
-        //     case Enemy:
-        //         EnemyTurn();
-        //         break;
-        // }
-    }
-
-    public void EndTurn()
-    {
-        EndGame();
-    }
 
     public enum PlayerAction
     {
@@ -70,7 +61,7 @@ class BattleEngine(BattleSetup battleSetup)
     public PlayerAction PlayerChoice()
     {
 
-        print.StartBattleMessage();
+        print.TurnChoice();
 
         int value = Convert.ToInt32(Console.ReadLine());
 
@@ -84,16 +75,15 @@ class BattleEngine(BattleSetup battleSetup)
 
     
     
-    public void GetPlayerAction(Combatant combatant, Combatant target, PlayerAction action)
+    public void GetPlayerAction(Combatant player, Combatant target, PlayerAction action)
     {
-        
         switch (action)
         {
             case PlayerAction.Attack:
-                combatant.ActionQueue.Enqueue(new AttackIntent(combatant, target));
+                player.ActionQueue.Enqueue(new AttackIntent(player, target));
                 break;
             case PlayerAction.Defend:
-                combatant.ActionQueue.Enqueue(new DefendItent(combatant));
+                player.ActionQueue.Enqueue(new DefendItent(player));
                 break;
         }
     }
@@ -102,15 +92,45 @@ class BattleEngine(BattleSetup battleSetup)
 
 
     
-    public void EnemyChoice()
+    public EnemyAction EnemyChoice()
     {
         int Hp_percentage = battleContext.Enemy.CurrHp / battleContext.Enemy.MaxHp * 100;
+
+        if (Hp_percentage >= 70)
+        {
+            return EnemyAction.Attack;
+        }
+
+        if (Hp_percentage < 30)
+        {
+            return EnemyAction.Defend;
+        }
+
+        Random rng = new();
+
+        return rng.NextDouble() < 0.5
+            ? EnemyAction.Attack
+            : EnemyAction.Defend;
+    }
+
+    public void GetEnemyAction(Combatant enemy, Combatant target, EnemyAction action)
+    {
+        switch (action)
+        {
+            case EnemyAction.Attack:
+                enemy.ActionQueue.Enqueue(new AttackIntent(enemy, target));
+                break;
+            case EnemyAction.Defend:
+                enemy.ActionQueue.Enqueue(new DefendItent(enemy));
+                break;
+        }
     }
 
 
-    public void EndGame()
+    public static void EndGame()
     {
-
+        Console.WriteLine("Thank you for playing! Exiting...");
+        Environment.Exit(0);
     }
     
 }

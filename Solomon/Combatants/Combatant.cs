@@ -16,7 +16,7 @@ abstract class Combatant
 
     public bool IsDead()
     {
-        if (CurrHp <= 0)
+        if (CurrHp == 0)
         {
             return true;
         }

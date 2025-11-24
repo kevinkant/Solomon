@@ -23,7 +23,23 @@ record AttackIntent(Combatant Attacker, Combatant Target) : IActionIntent
     }
 }
 
+/// <summary>
+/// Buff attacker's next attack
+/// </summary>
+/// <param name="Attacker"></param>
 record BuffIntent(Combatant Attacker) : IActionIntent
+{
+    public void Execute()
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// 2 Turn attack where attacker charges their attack in the first turn and releases that attack in the second turn
+/// </summary>
+/// <param name="Attacker"></param>
+record ChargeItnent(Combatant Attacker) : IActionIntent
 {
     public void Execute()
     {
